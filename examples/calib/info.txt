@@ -1,0 +1,2 @@
+Image Size: 640x480
+Robot MAC: 00:01:36:1D:98:DE

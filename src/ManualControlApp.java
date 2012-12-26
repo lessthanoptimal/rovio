@@ -7,12 +7,12 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * @author Peter Abeles
  */
-public class DemoManualControl implements KeyListener {
-
+public class ManualControlApp implements KeyListener {
 
 	final RovioControl control;
 	final ImagePanel gui;
@@ -22,10 +22,10 @@ public class DemoManualControl implements KeyListener {
 	int imageNum;
 	int captureFlag = 0;
 
-	public DemoManualControl(final String ip) {
+	public ManualControlApp(final String ip) {
 		control = new RovioControl(ip);
 
-		while( !control.setImageResolution(2) ){}
+		while( !control.setImageResolution(3) ){}
 		while( !control.setImageCompression(2) ){}
 
 		BufferedImage img = null;
@@ -63,7 +63,22 @@ public class DemoManualControl implements KeyListener {
 		final BufferedImage img = control.captureImage();
 
 		if( img != null ) {
-			if( captureFlag != 0 ) {
+			escape:if( captureFlag != 0 ) {
+				File dir = new File("images");
+				if( dir.exists() ) {
+					if( !dir.isDirectory() ) {
+						System.err.println("images/ exists, but isn't a directory");
+						captureFlag = 0;
+						break escape;
+					}
+				} else {
+					if( !dir.mkdir() ) {
+						System.err.println("Couldn't create images/ directory");
+						captureFlag = 0;
+						break escape;
+					}
+				}
+
 				System.out.println("Image saved "+imageNum);
 				UtilImageIO.saveImage(img,String.format("images/image%05d.jpg",imageNum++));
 				if( captureFlag == 1 ) {
@@ -115,7 +130,7 @@ public class DemoManualControl implements KeyListener {
 		} else if( key == '4' ) {
 			control.movement(RovioManual.STRAIGHT_LEFT,5);
 		} else if( key == '6' ) {
-			control.movement(RovioManual.STRAIGHT_right,5);
+			control.movement(RovioManual.STRAIGHT_RIGHT,5);
 		} else if( key == '7') {
 			control.movement(RovioManual.ROTATE_LEFT_20,5);
 		} else if( key == '9') {
@@ -153,6 +168,8 @@ public class DemoManualControl implements KeyListener {
 				captureFlag = 2;
 			else
 				captureFlag = 0;
+		} else if( key == 'a' ) {
+			System.out.println("MAC Address = "+control.getMacAddress());
 		} else {
 			control.movement(RovioManual.STOP,5);
 		}
@@ -170,7 +187,7 @@ public class DemoManualControl implements KeyListener {
 	public void keyReleased(KeyEvent e) {}
 
 	public static void main( String args[] ) {
-		DemoManualControl app = new DemoManualControl("192.168.1.31");
+		ManualControlApp app = new ManualControlApp("192.168.1.31");
 		app.run();
 	}
 }

@@ -43,9 +43,6 @@ public class RovioControl {
 
 	}
 
-	public void setRobotName() {
-
-	}
 
 	public boolean setHeadLights( int value ) {
 		return sendCgi("rev.cgi?Cmd=nav&action=19&LIGHT="+value);
@@ -91,14 +88,17 @@ public class RovioControl {
 	}
 
 	/**
+	 * Specifies image resolution
 	 *
+	 * <pre>
 	 * 0 = 176x144
 	 * 1 = 352x288
 	 * 2 = 320,240
 	 * 3 = 640x480
+	 * </pre>
 	 *
-	 * @param which
-	 * @return
+	 * @param which Which resolution should the camera be set to
+	 * @return true if successful.
 	 */
 	public boolean setImageResolution( int which ) {
 		if( which < 0 && which > 3 )
@@ -137,15 +137,19 @@ public class RovioControl {
 		return sendCgi("ChangeBrightness.cgi?Brightness="+brightness);
 	}
 
+	/**
+	 * Requests the the Rovio captures a jpeg image.
+	 *
+	 * @return The image or null if it fails.
+	 */
 	public BufferedImage captureImage() {
 
 		if( sendCgi("Jpeg/CamImg0000.jpg")) {
 			try {
-				if( inputSize == -1 )
-					System.out.println("WTF");
-				BufferedImage image = ImageIO.read(new ByteArrayInputStream(inputBuff,0,inputSize));
-				return image;
+				return ImageIO.read(new ByteArrayInputStream(inputBuff,0,inputSize));
 			} catch (IOException e) {
+				error = Error.IO_EXCEPTION;
+			} catch( ArrayIndexOutOfBoundsException e ) {
 				error = Error.IO_EXCEPTION;
 			}
 		}
@@ -153,6 +157,27 @@ public class RovioControl {
 		return null;
 	}
 
+	/**
+	 * A string containing the ethernet MAC address.
+	 *
+	 * @return The MAC address or null if it fails.
+	 */
+	public String getMacAddress() {
+		if( sendCgi("GetMac.cgi")) {
+			String s = new String(inputBuff,0,inputSize);
+			return s.substring(6,s.length());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Manually control the robots motion.
+	 *
+	 * @param type Which motion should it perform.
+	 * @param speed How fast should the robot move. from 1 to 10
+	 * @return true for success
+	 */
 	public boolean movement( RovioManual type, int speed ) {
 		if( speed < 1 || speed > 10 )
 			throw new IllegalArgumentException("Speed must be 1 <= speed <= 10");
