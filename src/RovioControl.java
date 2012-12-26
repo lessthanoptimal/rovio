@@ -165,7 +165,7 @@ public class RovioControl {
 	public String getMacAddress() {
 		if( sendCgi("GetMac.cgi")) {
 			String s = new String(inputBuff,0,inputSize);
-			return s.substring(6,s.length());
+			return s.substring(6,s.length()).trim();
 		}
 
 		return null;

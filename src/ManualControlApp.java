@@ -187,7 +187,7 @@ public class ManualControlApp implements KeyListener {
 	public void keyReleased(KeyEvent e) {}
 
 	public static void main( String args[] ) {
-		ManualControlApp app = new ManualControlApp("192.168.1.31");
+		ManualControlApp app = new ManualControlApp("192.168.1.30");
 		app.run();
 	}
 }

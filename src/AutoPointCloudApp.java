@@ -93,6 +93,8 @@ public class AutoPointCloudApp {
 			while( MAC == null)
 				MAC = control.getMacAddress();
 
+			System.out.println("Robot MAC = "+MAC);
+
 			// see if the configuration files have already been computed
 			String configDir = RovioHelperOps.findRobotDirectory(MAC,true);
 			intrinsic = BoofMiscOps.loadXML(configDir+"/intrinsic.xml");
@@ -388,7 +390,7 @@ public class AutoPointCloudApp {
 	}
 
 	public static void main( String args[] ) {
-		AutoPointCloudApp app = new AutoPointCloudApp("192.168.1.31");
+		AutoPointCloudApp app = new AutoPointCloudApp("192.168.1.30");
 
 		app.configureRobot();
 		app.moveRobotCaptureImages();
