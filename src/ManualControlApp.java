@@ -22,6 +22,9 @@ public class ManualControlApp implements KeyListener {
 	int imageNum;
 	int captureFlag = 0;
 
+	// how long after it captures an image will it try to grab another image
+	int imageDelay = 50;
+
 	public ManualControlApp(final String ip) {
 		control = new RovioControl(ip);
 
@@ -45,8 +48,8 @@ public class ManualControlApp implements KeyListener {
 
 		while( true ) {
 			if( update < System.currentTimeMillis() ) {
-				update = System.currentTimeMillis() + 100;
 				updateImage();
+				update = System.currentTimeMillis() + imageDelay;
 			}
 
 			if( command != 0 ) {
@@ -123,28 +126,33 @@ public class ManualControlApp implements KeyListener {
 	}
 
 	private void performCommand( char key ) {
+		while( control.isCoolingDown() ) {
+			Thread.yield();
+		}
+
+		boolean success = true;
 		if( key == '8' ) {
-			control.movement(RovioManual.FORWARD,5);
+			success = control.movement(RovioManualMotion.FORWARD,5);
 		} else if( key == '5' ) {
-			control.movement(RovioManual.BACKWARD,5);
+			success = control.movement(RovioManualMotion.BACKWARD,5);
 		} else if( key == '4' ) {
-			control.movement(RovioManual.STRAIGHT_LEFT,5);
+			success = control.movement(RovioManualMotion.STRAIGHT_LEFT,5);
 		} else if( key == '6' ) {
-			control.movement(RovioManual.STRAIGHT_RIGHT,5);
+			success = control.movement(RovioManualMotion.STRAIGHT_RIGHT,5);
 		} else if( key == '7') {
-			control.movement(RovioManual.ROTATE_LEFT_20,5);
+			success = control.movement(RovioManualMotion.ROTATE_LEFT_20,5);
 		} else if( key == '9') {
-			control.movement(RovioManual.ROTATE_RIGHT_20,5);
+			success = control.movement(RovioManualMotion.ROTATE_RIGHT_20,5);
 		} else if( key == 'l' ) {
-			control.setHeadLights(1);
+			success = control.setHeadLights(1);
 		} else if( key == 'L' ) {
-			control.setHeadLights(0);
+			success = control.setHeadLights(0);
 		} else if( key == '1' ) {
-			control.movement(RovioManual.HEAD_DOWN,1);
+			success = control.movement(RovioManualMotion.HEAD_DOWN,1);
 		} else if( key == '2' ) {
-			control.movement(RovioManual.HEAD_MIDDLE,1);
+			success = control.movement(RovioManualMotion.HEAD_MIDDLE,1);
 		} else if( key == '3' ) {
-			control.movement(RovioManual.HEAD_UP,1);
+			success = control.movement(RovioManualMotion.HEAD_UP,1);
 		} else if( key == 's' ) {
 			RovioMcuReport r = control.getMcuReport(null);
 			if( r != null ) {
@@ -170,8 +178,15 @@ public class ManualControlApp implements KeyListener {
 				captureFlag = 0;
 		} else if( key == 'a' ) {
 			System.out.println("MAC Address = "+control.getMacAddress());
+		} else if( key == 'd' ) {
+			int response = control.action(RovioActions.GO_HOME_AND_DOCK);
+			System.out.println("Action response = "+response);
 		} else {
-			control.movement(RovioManual.STOP,5);
+			success = control.movement(RovioManualMotion.STOP,5);
+		}
+
+		if( !success ) {
+			System.out.println("command failed: "+control.error);
 		}
 	}
 
@@ -187,7 +202,7 @@ public class ManualControlApp implements KeyListener {
 	public void keyReleased(KeyEvent e) {}
 
 	public static void main( String args[] ) {
-		ManualControlApp app = new ManualControlApp("192.168.1.30");
+		ManualControlApp app = new ManualControlApp("192.168.1.31");
 		app.run();
 	}
 }

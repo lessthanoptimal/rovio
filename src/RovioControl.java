@@ -178,11 +178,28 @@ public class RovioControl {
 	 * @param speed How fast should the robot move. from 1 to 10
 	 * @return true for success
 	 */
-	public boolean movement( RovioManual type, int speed ) {
+	public boolean movement( RovioManualMotion type, int speed ) {
 		if( speed < 1 || speed > 10 )
 			throw new IllegalArgumentException("Speed must be 1 <= speed <= 10");
 
 		return sendCgi("/rev.cgi?Cmd=nav&action=18&drive="+type.getValue()+"&speed="+speed);
+	}
+
+	/**
+	 * Tell the Rovio to perform a high-level action.
+	 *
+	 * @param type Which action should it perform
+	 * @return If -1 then the send command failed.  If >= 0 it is the response rovio gave
+	 */
+	public int action( RovioActions type ) {
+//		return sendCgi("/rev.cgi?Cmd=nav&action="+type.getValue());
+
+		if( !sendCgi("/rev.cgi?Cmd=nav&action="+type.getValue()) )
+			return -1;
+
+		int start = 10+12;
+		String s = new String(inputBuff,start,inputSize-start-1);
+		return Integer.parseInt(s);
 	}
 
 	protected boolean sendCgi( String text ) {
@@ -254,6 +271,10 @@ public class RovioControl {
 
 	public Error getError() {
 		return error;
+	}
+
+	public boolean isCoolingDown() {
+		return coolDownTime > System.currentTimeMillis();
 	}
 
 	public static enum Error {

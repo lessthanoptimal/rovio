@@ -3,7 +3,7 @@
  *
  * @author Peter Abeles
  */
-public enum RovioManual {
+public enum RovioManualMotion {
 
 	STOP(0),
 	FORWARD(1),
@@ -22,7 +22,7 @@ public enum RovioManual {
 	ROTATE_LEFT_20(17),
 	ROTATE_RIGHT_20(18);
 
-	private RovioManual(int value) {
+	private RovioManualMotion(int value) {
 		this.value = value;
 	}
 

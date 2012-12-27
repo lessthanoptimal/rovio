@@ -34,7 +34,6 @@ import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
@@ -42,7 +41,6 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -121,9 +119,9 @@ public class AutoPointCloudApp {
 
 		origLeft = captureScaleImage();
 
-		control.movement(RovioManual.STRAIGHT_RIGHT,10);
+		control.movement(RovioManualMotion.STRAIGHT_RIGHT,10);
 		BoofMiscOps.pause(50);
-		control.movement(RovioManual.STRAIGHT_RIGHT,10);
+		control.movement(RovioManualMotion.STRAIGHT_RIGHT,10);
 
 		BoofMiscOps.pause(750);
 
